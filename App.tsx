@@ -1,29 +1,42 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image, FlatList, ImageBackground } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Install expo-linear-gradient if not already installed
-import { PanResponder } from 'react-native';
 
-const albumCover = 'https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg';
+import React from "react";
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View
+   PanResponder
+} from "react-native";
+import { LinearGradient } from 'expo-linear-gradient'; 
+
+
+const albumCover =
+	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
 
 const data: Array<ShelfProps> = [
-  [
-    { name: 'The Beatles', image: albumCover, id: '1' },
-    { name: 'The Beatles', image: albumCover, id: '2' },
-    { name: 'The Beatles', image: albumCover, id: '3' },
-  ],
-  [
-    { name: 'The Beatles', image: albumCover, id: '4' },
-    { name: 'The Beatles', image: albumCover, id: '5' },
-    { name: 'The Beatles', image: albumCover, id: '6' },
-  ],
-  [
-    { name: 'The Beatles', image: albumCover, id: '7' },
-    { name: 'The Beatles', image: albumCover, id: '8' },
-    { name: 'The Beatles', image: albumCover, id: '9' },
-  ],
+	[
+		{ name: "The Beatles", image: albumCover, id: "1" },
+		{ name: "The Beatles", image: albumCover, id: "2" },
+		{ name: "The Beatles", image: albumCover, id: "3" }
+	],
+	[
+		{ name: "The Beatles", image: albumCover, id: "4" },
+		{ name: "The Beatles", image: albumCover, id: "5" },
+		{ name: "The Beatles", image: albumCover, id: "6" }
+	],
+	[
+		{ name: "The Beatles", image: albumCover, id: "7" },
+		{ name: "The Beatles", image: albumCover, id: "8" },
+		{ name: "The Beatles", image: albumCover, id: "9" }
+	]
 ];
 
 function Shelf({ shelf }: { shelf: ShelfProps }) {
+
+
   return (
     <View style={styles.shelfContainer} >
       {/* Row of album covers */}
@@ -91,29 +104,30 @@ export default function App() {
   return (
     <View style={styles.fullContainer} >
     <ImageBackground
-      source={require('./assets/texture-background.jpg')} // Ensure the image is in the correct path
-      style={styles.background}
-      resizeMode="cover"
-    >
+			source={require("./assets/shelfBackground.png")} // Ensure the image is in the correct path
+			style={styles.background}
+			resizeMode="cover"
+		>
       <LinearGradient
         colors={['transparent', 'black']}
         style={styles.gradient}
       />
       <View style={styles.fullContainer}>
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
           <FlatList
             data={data}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item }) => <Shelf shelf={item} />}
             contentContainerStyle={styles.list}
           />
-        </View>
+        </SafeAreaView>
         {/* Record component positioned at the bottom */}
         <Record />
             </View>
     </ImageBackground>
     </View>
   );
+
 }
 
 function Record() {
@@ -132,6 +146,9 @@ type albumCoverProps = {
   id: string;
 }
 const styles = StyleSheet.create({
+
+	
+
   fullContainer: {
     flex: 1,
     flexDirection: 'column',
@@ -187,3 +204,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'black', // Optional: Add a background color for contrast
   },
 });
+
