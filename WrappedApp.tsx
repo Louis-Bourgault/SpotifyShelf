@@ -1,11 +1,14 @@
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import App from "./App";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const WrappedApp = () => {
 	return (
-		<SafeAreaProvider>
-			<App />
-		</SafeAreaProvider>
+		<GestureHandlerRootView>
+			<SafeAreaProvider>
+				<App />
+			</SafeAreaProvider>
+		</GestureHandlerRootView>
 	);
 };
 
