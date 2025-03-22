@@ -1,13 +1,13 @@
 import React from "react";
 import {
-	StyleSheet,
-	Text,
-	View,
-	Image,
-	FlatList,
-	ImageBackground
+  FlatList,
+  Image,
+  ImageBackground,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient"; // Install expo-linear-gradient if not already installed
 
 const albumCover =
 	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
@@ -58,18 +58,14 @@ export default function App() {
 			style={styles.background}
 			resizeMode="cover"
 		>
-			{/* <LinearGradient
-        colors={['transparent', 'black']}
-        style={styles.gradient}
-      />*/}
-			<View style={styles.container}>
+			<SafeAreaView style={styles.container}>
 				<FlatList
 					data={data}
 					keyExtractor={(_, index) => index.toString()}
 					renderItem={({ item }) => <Shelf shelf={item} />}
 					contentContainerStyle={styles.list}
 				/>
-			</View>
+			</SafeAreaView>
 		</ImageBackground>
 	);
 }
