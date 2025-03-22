@@ -1,15 +1,13 @@
-
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Image, ImageBackground, StyleSheet, View } from "react-native";
+import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
 import {
-  SafeAreaView,
-  useSafeAreaInsets
+	SafeAreaView,
+	useSafeAreaInsets
 } from "react-native-safe-area-context";
 
-
 const albumCover =
-  "https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
+	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
 
 const albums: any[] = [
 	{ name: "The Beatles", image: albumCover, id: "1" },
@@ -42,7 +40,13 @@ const App = () => {
 							</View>
 						))}
 					</View>
-					<View style={{ height: "30%" }}>
+					<View
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							height: "30%"
+						}}
+					>
 						<LinearGradient
 							colors={[
 								"rgba(0,0,0,0)",
@@ -52,21 +56,44 @@ const App = () => {
 								"rgba(16,16,16,1)"
 							]}
 							locations={[0, 0.22, 0.27, 0.31, 0.35]}
-							style={{ flex: 1 }}
+							style={{
+								position: "absolute",
+								top: 0,
+								left: 0,
+								right: 0,
+								bottom: 0
+							}}
 						/>
+						<View
+							style={{
+								alignItems: "center",
+								display: "flex",
+								flex: 1,
+								justifyContent: "space-evenly"
+							}}
+						>
+							<Image source={require("./assets/shuffle.png")} />
+							<Image source={require("./assets/prevNext.png")} />
+						</View>
+						<View
+							style={{ backgroundColor: "green", flex: 2 }}
+						></View>
+						<View
+							style={{ backgroundColor: "blue", flex: 1 }}
+						></View>
 					</View>
 				</SafeAreaView>
-        <View
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: insets.bottom,
-            backgroundColor: "#101010",
-            zIndex: 0
-          }}
-        />
+				<View
+					style={{
+						position: "absolute",
+						left: 0,
+						right: 0,
+						bottom: 0,
+						height: insets.bottom,
+						backgroundColor: "#101010",
+						zIndex: 0
+					}}
+				/>
 			</ImageBackground>
 		</View>
 	);
