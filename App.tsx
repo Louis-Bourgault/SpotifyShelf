@@ -7,8 +7,8 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  View
-   PanResponder
+  View,
+  PanResponder
 } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient'; 
 
