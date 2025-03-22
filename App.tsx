@@ -1,6 +1,11 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import React, { useRef } from "react";
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue
+} from "react-native-reanimated";
 import {
 	SafeAreaView,
 	useSafeAreaInsets
@@ -17,6 +22,28 @@ const albums: any[] = [
 
 const App = () => {
 	const insets = useSafeAreaInsets();
+	const volumeHeight = useSharedValue(0);
+	const sliderHeight = useSharedValue(0);
+	const sliderWidth = useSharedValue(0);
+	const startY = useSharedValue(0);
+	const y = useSharedValue(0);
+
+	const panGesture = Gesture.Pan()
+		.onStart(() => (startY.value = y.value))
+		.onUpdate((e) => {
+			const newY = startY.value + e.translationY;
+			y.value = Math.min(
+				volumeHeight.value / 2 - sliderHeight.value / 2,
+				Math.max(-volumeHeight.value / 2 + sliderHeight.value / 2, newY)
+			);
+
+			console.log(y.value);
+		});
+
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateY: y.value }],
+		left: sliderWidth.value * 0.125
+	}));
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -79,8 +106,38 @@ const App = () => {
 							style={{ backgroundColor: "green", flex: 2 }}
 						></View>
 						<View
-							style={{ backgroundColor: "blue", flex: 1 }}
-						></View>
+							style={{
+								alignItems: "center",
+								display: "flex",
+								flex: 1,
+								justifyContent: "center"
+							}}
+						>
+							<Image
+								onLayout={(e) => {
+									volumeHeight.value =
+										e.nativeEvent.layout.height;
+								}}
+								source={require("./assets/volume.png")}
+							/>
+							<GestureDetector gesture={panGesture}>
+								<Animated.Image
+									onLayout={(e) => {
+										sliderHeight.value =
+											e.nativeEvent.layout.height;
+										sliderWidth.value =
+											e.nativeEvent.layout.width;
+									}}
+									source={require("./assets/slider.png")}
+									style={[
+										{
+											position: "absolute"
+										},
+										animatedStyle
+									]}
+								/>
+							</GestureDetector>
+						</View>
 					</View>
 				</SafeAreaView>
 				<View
