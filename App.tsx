@@ -1,14 +1,15 @@
+
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { Image, ImageBackground, StyleSheet, View } from "react-native";
 import {
-	SafeAreaProvider,
-	SafeAreaView,
-	useSafeAreaInsets
+  SafeAreaView,
+  useSafeAreaInsets
 } from "react-native-safe-area-context";
 
+
 const albumCover =
-	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
+  "https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
 
 const albums: any[] = [
 	{ name: "The Beatles", image: albumCover, id: "1" },
