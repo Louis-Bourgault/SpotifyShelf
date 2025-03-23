@@ -7,9 +7,14 @@ import {
 	StyleSheet,
 	View
 } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import {
+	Gesture,
+	GestureDetector,
+	Pressable
+} from "react-native-gesture-handler";
 import Animated, {
 	Easing,
+	runOnJS,
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming
@@ -49,11 +54,45 @@ const App = () => {
 		index: number;
 		layout: { x: number; y: number; width: number; height: number };
 	}>(null);
+	const [selectedAlbumIndex, setSelectedAlbumIndex] = useState<number | null>(
+		null
+	);
+
+	const handleAlbumClose = () => {
+		if (expandedAlbum) {
+			animatedHeight.value = withTiming(100, {
+				duration: 1000,
+				easing: Easing.inOut(Easing.ease)
+			});
+			animatedWidth.value = withTiming(100, {
+				duration: 1000,
+				easing: Easing.inOut(Easing.ease)
+			});
+			animatedX.value = withTiming(expandedAlbum?.layout.x, {
+				duration: 1000,
+				easing: Easing.inOut(Easing.ease)
+			});
+			animatedY.value = withTiming(
+				expandedAlbum?.layout.y - insets.top,
+				{
+					duration: 1000,
+					easing: Easing.inOut(Easing.ease)
+				},
+				(finished) => {
+					if (finished) {
+						runOnJS(setSelectedAlbumIndex)(null);
+						runOnJS(setExpandedAlbum)(null);
+					}
+				}
+			);
+		}
+	};
 
 	const handleAlbumPress = (
 		index: number,
 		layout: { x: number; y: number; width: number; height: number }
 	) => {
+		setSelectedAlbumIndex(index);
 		setExpandedAlbum({ index, layout });
 
 		animatedHeight.value = layout.height;
@@ -122,9 +161,15 @@ const App = () => {
 								<View key={shelfIndex} style={styles.shelf}>
 									{albums.map((album, albumIndex) => (
 										<Album
-											key={shelfIndex + albumIndex}
-											albumIndex={shelfIndex + albumIndex}
+											albumIndex={
+												shelfIndex * 3 + albumIndex
+											}
 											imageURL={album.image}
+											isSelected={
+												selectedAlbumIndex ===
+												shelfIndex * 3 + albumIndex
+											}
+											key={shelfIndex * 3 + albumIndex}
 											onPress={handleAlbumPress}
 										/>
 									))}
@@ -132,17 +177,29 @@ const App = () => {
 							)
 						)}
 						{expandedAlbum && (
-							<Animated.View style={overlayAnimatedStyle}>
-								<Image
-									resizeMode="cover"
-									source={{ uri: albumCover }}
-									style={{
-										borderRadius: 10,
-										height: "100%",
-										width: "100%"
-									}}
-								/>
-							</Animated.View>
+							<Pressable
+								onPress={handleAlbumClose}
+								style={{
+									position: "absolute",
+									top: 0,
+									left: 0,
+									right: 0,
+									bottom: 0,
+									zIndex: 999
+								}}
+							>
+								<Animated.View style={overlayAnimatedStyle}>
+									<Image
+										resizeMode="cover"
+										source={{ uri: albumCover }}
+										style={{
+											borderRadius: 10,
+											height: "100%",
+											width: "100%"
+										}}
+									/>
+								</Animated.View>
+							</Pressable>
 						)}
 					</View>
 					<View

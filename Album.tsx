@@ -1,14 +1,15 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Image, Pressable, View } from "react-native";
 
 const Album: React.FC<{
 	albumIndex: number;
 	imageURL: string;
+    isSelected: boolean;
 	onPress: (
 		index: number,
 		layout: { x: number; y: number; width: number; height: number }
 	) => void;
-}> = ({ albumIndex, imageURL, onPress }) => {
+}> = ({ albumIndex, imageURL, isSelected, onPress }) => {
 	const albumRef = useRef<View>(null);
 
 	const handlePress = () => {
@@ -21,14 +22,21 @@ const Album: React.FC<{
 		<Pressable
 			key={albumIndex}
 			onPress={handlePress}
-            ref={albumRef}
+			ref={albumRef}
 			style={{
-				alignItems: "center"
+				alignItems: "center",
+				height: 100,
+				width: 100
 			}}
 		>
 			<Image
 				source={{ uri: imageURL }}
-				style={{ borderRadius: 5, height: 100, width: 100 }}
+				style={{
+					borderRadius: 5,
+					display: isSelected ? "none" : "flex",
+					height: 100,
+					width: 100
+				}}
 			/>
 		</Pressable>
 	);
