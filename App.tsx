@@ -1,7 +1,11 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef } from "react";
 import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import {
+	Gesture,
+	GestureDetector,
+	Pressable
+} from "react-native-gesture-handler";
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue
@@ -10,6 +14,7 @@ import {
 	SafeAreaView,
 	useSafeAreaInsets
 } from "react-native-safe-area-context";
+import Album from "./Album";
 
 const albumCover =
 	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
@@ -52,18 +57,15 @@ const App = () => {
 			>
 				<SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
 					<View style={{ height: "70%" }}>
-						{Array.from({ length: 4 }).map((element) => (
-							<View style={styles.shelf}>
-								{albums.map((album) => (
-									<View style={styles.albumContainer}>
-										<Image
-											source={{ uri: album.image }}
-											style={styles.albumCover}
-										/>
-									</View>
-								))}
-							</View>
-						))}
+						{Array.from({ length: 4 }).map(
+							(element, shelfIndex) => (
+								<View key={shelfIndex} style={styles.shelf}>
+									{albums.map((album, albumIndex) => (
+										<Album albumIndex={albumIndex} imageURL={album.image} />
+									))}
+								</View>
+							)
+						)}
 					</View>
 					<View
 						style={{
@@ -187,15 +189,6 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		marginBottom: 10, // Add spacing between the row and the shelf
 		width: "90%"
-	},
-	albumContainer: {
-		alignItems: "center"
-	},
-	albumCover: {
-		backgroundColor: "blue",
-		width: 100,
-		height: 100,
-		borderRadius: 5
 	},
 	albumText: {
 		marginTop: 5,
