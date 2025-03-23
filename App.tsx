@@ -25,13 +25,27 @@ import {
 } from "react-native-safe-area-context";
 import Album from "./Album";
 
-const albumCover =
-	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
-
-const albums: any[] = [
-	{ name: "The Beatles", image: albumCover, id: "1" },
-	{ name: "The Beatles", image: albumCover, id: "2" },
-	{ name: "The Beatles", image: albumCover, id: "3" }
+const albums: string[][] = [
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-001-Marvin-Gaye-WHATS-GOING-ON.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-002-Beach-Boys-PET-SOUNDS-update.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-003-JoniMitchell-BLUE-HR.jpg?w=1000"
+	],
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-004-Stevie-Wonder-SONGS-IN-THE-KEY-OF-LIFE.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-005-Beatles-ABBEY-ROAD.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-006-Nirvana-NEVERMIND-HR.jpg?w=1000"
+	],
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-007-Fleetwood-Mac-RUMOURS.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-008-Prince-PURPLE-RAIN.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-009-Bob-Dylan-BLOOD-ON-THE-TRACKS.jpg?w=1000"
+	],
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-010-Lauryn-Hill-MISEDUCATION.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-011-BeatlesREVOLVER-updated.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-012-MichaelJacksonThriller.jpg?w=1000"
+	]
 ];
 
 const screenHeight = Dimensions.get("screen").height;
@@ -44,6 +58,8 @@ const App = () => {
 	const animatedWidth = useSharedValue(0);
 	const animatedX = useSharedValue(0);
 	const animatedY = useSharedValue(0);
+	const recordX = useSharedValue(0);
+	const recordZIndex = useSharedValue(0);
 	const sliderHeight = useSharedValue(0);
 	const sliderWidth = useSharedValue(0);
 	const startY = useSharedValue(0);
@@ -60,31 +76,49 @@ const App = () => {
 
 	const handleAlbumClose = () => {
 		if (expandedAlbum) {
-			animatedHeight.value = withTiming(100, {
-				duration: 1000,
-				easing: Easing.inOut(Easing.ease)
-			});
-			animatedWidth.value = withTiming(100, {
-				duration: 1000,
-				easing: Easing.inOut(Easing.ease)
-			});
-			animatedX.value = withTiming(expandedAlbum?.layout.x, {
-				duration: 1000,
-				easing: Easing.inOut(Easing.ease)
-			});
-			animatedY.value = withTiming(
-				expandedAlbum?.layout.y - insets.top,
-				{
-					duration: 1000,
-					easing: Easing.inOut(Easing.ease)
-				},
-				(finished) => {
-					if (finished) {
-						runOnJS(setSelectedAlbumIndex)(null);
-						runOnJS(setExpandedAlbum)(null);
-					}
+			recordX.value = withTiming(200, { duration: 1000 }, (f) => {
+				if (f) {
+					recordZIndex.value = 0;
+					recordX.value = withTiming(
+						0,
+						{ duration: 1000 },
+						(finished) => {
+							if (finished) {
+								animatedHeight.value = withTiming(100, {
+									duration: 1000,
+									easing: Easing.inOut(Easing.ease)
+								});
+								animatedWidth.value = withTiming(100, {
+									duration: 1000,
+									easing: Easing.inOut(Easing.ease)
+								});
+								animatedX.value = withTiming(
+									expandedAlbum?.layout.x,
+									{
+										duration: 1000,
+										easing: Easing.inOut(Easing.ease)
+									}
+								);
+								animatedY.value = withTiming(
+									expandedAlbum?.layout.y - insets.top,
+									{
+										duration: 1000,
+										easing: Easing.inOut(Easing.ease)
+									},
+									(finished) => {
+										if (finished) {
+											runOnJS(setSelectedAlbumIndex)(
+												null
+											);
+											runOnJS(setExpandedAlbum)(null);
+										}
+									}
+								);
+							}
+						}
+					);
 				}
-			);
+			});
 		}
 	};
 
@@ -112,10 +146,23 @@ const App = () => {
 			duration: 1000,
 			easing: Easing.inOut(Easing.ease)
 		});
-		animatedY.value = withTiming((0.35 * screenHeight) / 2 - 100, {
-			duration: 1000,
-			easing: Easing.inOut(Easing.ease)
-		});
+		animatedY.value = withTiming(
+			(0.35 * screenHeight) / 2 - 100,
+			{
+				duration: 1000,
+				easing: Easing.inOut(Easing.ease)
+			},
+			(finished) => {
+				if (finished) {
+					recordX.value = withTiming(200, { duration: 1000 }, (f) => {
+						if (f) {
+							recordX.value = withTiming(100, { duration: 1000 });
+							recordZIndex.value = 2;
+						}
+					});
+				}
+			}
+		);
 	};
 
 	const panGesture = Gesture.Pan()
@@ -141,6 +188,11 @@ const App = () => {
 		width: animatedWidth.value
 	}));
 
+	const recordAnimatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: recordX.value }],
+		zIndex: recordZIndex.value
+	}));
+
 	return (
 		<View style={{ flex: 1 }}>
 			<ImageBackground
@@ -156,26 +208,22 @@ const App = () => {
 							position: "relative"
 						}}
 					>
-						{Array.from({ length: 4 }).map(
-							(element, shelfIndex) => (
-								<View key={shelfIndex} style={styles.shelf}>
-									{albums.map((album, albumIndex) => (
-										<Album
-											albumIndex={
-												shelfIndex * 3 + albumIndex
-											}
-											imageURL={album.image}
-											isSelected={
-												selectedAlbumIndex ===
-												shelfIndex * 3 + albumIndex
-											}
-											key={shelfIndex * 3 + albumIndex}
-											onPress={handleAlbumPress}
-										/>
-									))}
-								</View>
-							)
-						)}
+						{albums.map((shelf, shelfIndex) => (
+							<View key={shelfIndex} style={styles.shelf}>
+								{shelf.map((album, albumIndex) => (
+									<Album
+										albumIndex={shelfIndex * 3 + albumIndex}
+										imageURL={album}
+										isSelected={
+											selectedAlbumIndex ===
+											shelfIndex * 3 + albumIndex
+										}
+										key={shelfIndex * 3 + albumIndex}
+										onPress={handleAlbumPress}
+									/>
+								))}
+							</View>
+						))}
 						{expandedAlbum && (
 							<Pressable
 								onPress={handleAlbumClose}
@@ -191,12 +239,33 @@ const App = () => {
 								<Animated.View style={overlayAnimatedStyle}>
 									<Image
 										resizeMode="cover"
-										source={{ uri: albumCover }}
+										source={{
+											uri: albums[
+												Math.floor(
+													expandedAlbum.index / 3
+												)
+											][expandedAlbum.index % 3]
+										}}
 										style={{
 											borderRadius: 10,
 											height: "100%",
-											width: "100%"
+											width: "100%",
+											zIndex: 1
 										}}
+									/>
+									<Animated.Image
+										resizeMode="cover"
+										source={require("./assets/record.png")}
+										style={[
+											{
+												position: "absolute",
+												height: "150%",
+												width: "150%",
+												top: "-35%",
+												left: "-25%"
+											},
+											recordAnimatedStyle
+										]}
 									/>
 								</Animated.View>
 							</Pressable>
