@@ -22,6 +22,7 @@ import {
 import Album from "./components/Album";
 import BottomInsetGradient from "./components/BottomInsetGradient";
 import VolumeSlider from "./components/VolumeSlider";
+import Record from "./components/Record";
 
 const albums: string[][] = [
 	[
@@ -166,11 +167,6 @@ const App = () => {
 		width: animatedWidth.value
 	}));
 
-	const recordAnimatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateX: recordX.value }],
-		zIndex: recordZIndex.value
-	}));
-
 	return (
 		<View style={styles.container}>
 			<ImageBackground
@@ -234,19 +230,16 @@ const App = () => {
 											zIndex: 1
 										}}
 									/>
-									<Animated.Image
-										resizeMode="cover"
-										source={require("./assets/record.png")}
-										style={[
-											{
-												position: "absolute",
-												height: "150%",
-												width: "150%",
-												top: "-35%",
-												left: "-25%"
-											},
-											recordAnimatedStyle
-										]}
+									<Record
+										image={
+											albums[
+												Math.floor(
+													expandedAlbum.index / 3
+												)
+											][expandedAlbum.index % 3]
+										}
+										x={recordX}
+										zIndex={recordZIndex}
 									/>
 								</Animated.View>
 							</Pressable>
