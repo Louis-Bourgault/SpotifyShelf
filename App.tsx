@@ -23,7 +23,8 @@ import {
 	SafeAreaView,
 	useSafeAreaInsets
 } from "react-native-safe-area-context";
-import Album from "./Album";
+import Album from "./components/Album";
+import BottomInsetGradient from "./components/BottomInsetGradient";
 
 const albums: string[][] = [
 	[
@@ -194,13 +195,16 @@ const App = () => {
 	}));
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={styles.container}>
 			<ImageBackground
 				source={require("./assets/shelf.png")} // Ensure the image is in the correct path
 				style={{ display: "flex", flex: 1 }}
 				resizeMode="cover"
 			>
-				<SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+				<SafeAreaView
+					style={styles.container}
+					edges={["top", "bottom"]}
+				>
 					<View
 						style={{
 							display: "flex",
@@ -358,59 +362,21 @@ const App = () => {
 						</View>
 					</View>
 				</SafeAreaView>
-				<View
-					style={{
-						position: "absolute",
-						left: 0,
-						right: 0,
-						bottom: 0,
-						height: insets.bottom,
-						backgroundColor: "#101010",
-						zIndex: 0
-					}}
-				/>
+				<BottomInsetGradient />
 			</ImageBackground>
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	background: {
-		flex: 1
-	},
-	gradient: {
-		...StyleSheet.absoluteFillObject // Covers the entire screen
-	},
 	container: {
-		flex: 1,
-		paddingTop: 50
-	},
-	list: {
-		alignItems: "center"
-	},
-	row: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		marginBottom: 10, // Add spacing between the row and the shelf
-		width: "90%"
-	},
-	albumText: {
-		marginTop: 5,
-		fontSize: 12,
-		textAlign: "center",
-		color: "white" // Ensure text is visible on the dark background
+		flex: 1
 	},
 	shelf: {
 		display: "flex",
 		flexDirection: "row",
 		height: "25%",
 		justifyContent: "space-evenly"
-	},
-	shelfContainer: {
-		width: "95%",
-		flexDirection: "column",
-		alignItems: "center", // Center the shelf and row
-		marginBottom: 20 // Add spacing between shelves
 	}
 });
 
