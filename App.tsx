@@ -25,13 +25,27 @@ import {
 } from "react-native-safe-area-context";
 import Album from "./Album";
 
-const albumCover =
-	"https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg";
-
-const albums: any[] = [
-	{ name: "The Beatles", image: albumCover, id: "1" },
-	{ name: "The Beatles", image: albumCover, id: "2" },
-	{ name: "The Beatles", image: albumCover, id: "3" }
+const albums: string[][] = [
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-001-Marvin-Gaye-WHATS-GOING-ON.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-002-Beach-Boys-PET-SOUNDS-update.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-003-JoniMitchell-BLUE-HR.jpg?w=1000"
+	],
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-004-Stevie-Wonder-SONGS-IN-THE-KEY-OF-LIFE.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-005-Beatles-ABBEY-ROAD.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-006-Nirvana-NEVERMIND-HR.jpg?w=1000"
+	],
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-007-Fleetwood-Mac-RUMOURS.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-008-Prince-PURPLE-RAIN.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-009-Bob-Dylan-BLOOD-ON-THE-TRACKS.jpg?w=1000"
+	],
+	[
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-010-Lauryn-Hill-MISEDUCATION.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-011-BeatlesREVOLVER-updated.jpg?w=1000",
+		"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-012-MichaelJacksonThriller.jpg?w=1000"
+	]
 ];
 
 const screenHeight = Dimensions.get("screen").height;
@@ -156,26 +170,22 @@ const App = () => {
 							position: "relative"
 						}}
 					>
-						{Array.from({ length: 4 }).map(
-							(element, shelfIndex) => (
-								<View key={shelfIndex} style={styles.shelf}>
-									{albums.map((album, albumIndex) => (
-										<Album
-											albumIndex={
-												shelfIndex * 3 + albumIndex
-											}
-											imageURL={album.image}
-											isSelected={
-												selectedAlbumIndex ===
-												shelfIndex * 3 + albumIndex
-											}
-											key={shelfIndex * 3 + albumIndex}
-											onPress={handleAlbumPress}
-										/>
-									))}
-								</View>
-							)
-						)}
+						{albums.map((shelf, shelfIndex) => (
+							<View key={shelfIndex} style={styles.shelf}>
+								{shelf.map((album, albumIndex) => (
+									<Album
+										albumIndex={shelfIndex * 3 + albumIndex}
+										imageURL={album}
+										isSelected={
+											selectedAlbumIndex ===
+											shelfIndex * 3 + albumIndex
+										}
+										key={shelfIndex * 3 + albumIndex}
+										onPress={handleAlbumPress}
+									/>
+								))}
+							</View>
+						))}
 						{expandedAlbum && (
 							<Pressable
 								onPress={handleAlbumClose}
@@ -191,7 +201,13 @@ const App = () => {
 								<Animated.View style={overlayAnimatedStyle}>
 									<Image
 										resizeMode="cover"
-										source={{ uri: albumCover }}
+										source={{
+											uri: albums[
+												Math.floor(
+													expandedAlbum.index / 3
+												)
+											][expandedAlbum.index % 3]
+										}}
 										style={{
 											borderRadius: 10,
 											height: "100%",
