@@ -1,14 +1,18 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useRef } from "react";
-import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
 import {
-	Gesture,
-	GestureDetector,
-	Pressable
-} from "react-native-gesture-handler";
+	Dimensions,
+	Image,
+	ImageBackground,
+	StyleSheet,
+	View
+} from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+	Easing,
 	useAnimatedStyle,
-	useSharedValue
+	useSharedValue,
+	withTiming
 } from "react-native-reanimated";
 import {
 	SafeAreaView,
@@ -25,13 +29,55 @@ const albums: any[] = [
 	{ name: "The Beatles", image: albumCover, id: "3" }
 ];
 
+const screenHeight = Dimensions.get("screen").height;
+const screenWidth = Dimensions.get("screen").width;
+
 const App = () => {
 	const insets = useSafeAreaInsets();
-	const volumeHeight = useSharedValue(0);
+
+	const animatedHeight = useSharedValue(0);
+	const animatedWidth = useSharedValue(0);
+	const animatedX = useSharedValue(0);
+	const animatedY = useSharedValue(0);
 	const sliderHeight = useSharedValue(0);
 	const sliderWidth = useSharedValue(0);
 	const startY = useSharedValue(0);
+	const volumeHeight = useSharedValue(0);
 	const y = useSharedValue(0);
+
+	const [expandedAlbum, setExpandedAlbum] = useState<null | {
+		index: number;
+		layout: { x: number; y: number; width: number; height: number };
+	}>(null);
+
+	const handleAlbumPress = (
+		index: number,
+		layout: { x: number; y: number; width: number; height: number }
+	) => {
+		setExpandedAlbum({ index, layout });
+
+		animatedHeight.value = layout.height;
+		animatedWidth.value = layout.width;
+		animatedX.value = layout.x;
+		animatedY.value = layout.y;
+
+		animatedHeight.value = withTiming(200, {
+			duration: 1000,
+			easing: Easing.inOut(Easing.ease)
+		});
+		animatedWidth.value = withTiming(200, {
+			duration: 1000,
+			easing: Easing.inOut(Easing.ease)
+		});
+		animatedX.value = withTiming(screenWidth / 2 - 100, {
+			duration: 1000,
+			easing: Easing.inOut(Easing.ease)
+		});
+		animatedY.value = withTiming((0.35 * screenHeight) / 2 - 100, {
+			duration: 1000,
+			easing: Easing.inOut(Easing.ease)
+		});
+	};
 
 	const panGesture = Gesture.Pan()
 		.onStart(() => (startY.value = y.value))
@@ -48,6 +94,14 @@ const App = () => {
 		left: sliderWidth.value * 0.125
 	}));
 
+	const overlayAnimatedStyle = useAnimatedStyle(() => ({
+		height: animatedHeight.value,
+		left: animatedX.value,
+		position: "absolute",
+		top: animatedY.value,
+		width: animatedWidth.value
+	}));
+
 	return (
 		<View style={{ flex: 1 }}>
 			<ImageBackground
@@ -56,15 +110,39 @@ const App = () => {
 				resizeMode="cover"
 			>
 				<SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-					<View style={{ height: "70%" }}>
+					<View
+						style={{
+							display: "flex",
+							height: "70%",
+							position: "relative"
+						}}
+					>
 						{Array.from({ length: 4 }).map(
 							(element, shelfIndex) => (
 								<View key={shelfIndex} style={styles.shelf}>
 									{albums.map((album, albumIndex) => (
-										<Album albumIndex={albumIndex} imageURL={album.image} />
+										<Album
+											key={shelfIndex + albumIndex}
+											albumIndex={shelfIndex + albumIndex}
+											imageURL={album.image}
+											onPress={handleAlbumPress}
+										/>
 									))}
 								</View>
 							)
+						)}
+						{expandedAlbum && (
+							<Animated.View style={overlayAnimatedStyle}>
+								<Image
+									resizeMode="cover"
+									source={{ uri: albumCover }}
+									style={{
+										borderRadius: 10,
+										height: "100%",
+										width: "100%"
+									}}
+								/>
+							</Animated.View>
 						)}
 					</View>
 					<View
