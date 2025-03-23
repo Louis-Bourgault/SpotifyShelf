@@ -7,11 +7,7 @@ import {
 	StyleSheet,
 	View
 } from "react-native";
-import {
-	Gesture,
-	GestureDetector,
-	Pressable
-} from "react-native-gesture-handler";
+import { Pressable } from "react-native-gesture-handler";
 import Animated, {
 	Easing,
 	runOnJS,
@@ -23,7 +19,9 @@ import {
 	SafeAreaView,
 	useSafeAreaInsets
 } from "react-native-safe-area-context";
-import Album from "./Album";
+import Album from "./components/Album";
+import BottomInsetGradient from "./components/BottomInsetGradient";
+import VolumeSlider from "./components/VolumeSlider";
 
 const albums: string[][] = [
 	[
@@ -60,11 +58,6 @@ const App = () => {
 	const animatedY = useSharedValue(0);
 	const recordX = useSharedValue(0);
 	const recordZIndex = useSharedValue(0);
-	const sliderHeight = useSharedValue(0);
-	const sliderWidth = useSharedValue(0);
-	const startY = useSharedValue(0);
-	const volumeHeight = useSharedValue(0);
-	const y = useSharedValue(0);
 
 	const [expandedAlbum, setExpandedAlbum] = useState<null | {
 		index: number;
@@ -165,21 +158,6 @@ const App = () => {
 		);
 	};
 
-	const panGesture = Gesture.Pan()
-		.onStart(() => (startY.value = y.value))
-		.onUpdate((e) => {
-			const newY = startY.value + e.translationY;
-			y.value = Math.min(
-				volumeHeight.value / 2 - sliderHeight.value / 2,
-				Math.max(-volumeHeight.value / 2 + sliderHeight.value / 2, newY)
-			);
-		});
-
-	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateY: y.value }],
-		left: sliderWidth.value * 0.125
-	}));
-
 	const overlayAnimatedStyle = useAnimatedStyle(() => ({
 		height: animatedHeight.value,
 		left: animatedX.value,
@@ -194,13 +172,16 @@ const App = () => {
 	}));
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={styles.container}>
 			<ImageBackground
 				source={require("./assets/shelf.png")} // Ensure the image is in the correct path
 				style={{ display: "flex", flex: 1 }}
 				resizeMode="cover"
 			>
-				<SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+				<SafeAreaView
+					style={styles.container}
+					edges={["top", "bottom"]}
+				>
 					<View
 						style={{
 							display: "flex",
@@ -323,94 +304,24 @@ const App = () => {
 								}}
 							/>
 						</View>
-						<View
-							style={{
-								alignItems: "center",
-								display: "flex",
-								flex: 1,
-								justifyContent: "center"
-							}}
-						>
-							<Image
-								onLayout={(e) => {
-									volumeHeight.value =
-										e.nativeEvent.layout.height;
-								}}
-								source={require("./assets/volume.png")}
-							/>
-							<GestureDetector gesture={panGesture}>
-								<Animated.Image
-									onLayout={(e) => {
-										sliderHeight.value =
-											e.nativeEvent.layout.height;
-										sliderWidth.value =
-											e.nativeEvent.layout.width;
-									}}
-									source={require("./assets/slider.png")}
-									style={[
-										{
-											position: "absolute"
-										},
-										animatedStyle
-									]}
-								/>
-							</GestureDetector>
-						</View>
+						<VolumeSlider />
 					</View>
 				</SafeAreaView>
-				<View
-					style={{
-						position: "absolute",
-						left: 0,
-						right: 0,
-						bottom: 0,
-						height: insets.bottom,
-						backgroundColor: "#101010",
-						zIndex: 0
-					}}
-				/>
+				<BottomInsetGradient />
 			</ImageBackground>
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	background: {
-		flex: 1
-	},
-	gradient: {
-		...StyleSheet.absoluteFillObject // Covers the entire screen
-	},
 	container: {
-		flex: 1,
-		paddingTop: 50
-	},
-	list: {
-		alignItems: "center"
-	},
-	row: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		marginBottom: 10, // Add spacing between the row and the shelf
-		width: "90%"
-	},
-	albumText: {
-		marginTop: 5,
-		fontSize: 12,
-		textAlign: "center",
-		color: "white" // Ensure text is visible on the dark background
+		flex: 1
 	},
 	shelf: {
 		display: "flex",
 		flexDirection: "row",
 		height: "25%",
 		justifyContent: "space-evenly"
-	},
-	shelfContainer: {
-		width: "95%",
-		flexDirection: "column",
-		alignItems: "center", // Center the shelf and row
-		marginBottom: 20 // Add spacing between shelves
 	}
 });
 
