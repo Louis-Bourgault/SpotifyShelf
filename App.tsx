@@ -7,11 +7,7 @@ import {
 	StyleSheet,
 	View
 } from "react-native";
-import {
-	Gesture,
-	GestureDetector,
-	Pressable
-} from "react-native-gesture-handler";
+import { Pressable } from "react-native-gesture-handler";
 import Animated, {
 	Easing,
 	runOnJS,
@@ -25,6 +21,7 @@ import {
 } from "react-native-safe-area-context";
 import Album from "./components/Album";
 import BottomInsetGradient from "./components/BottomInsetGradient";
+import VolumeSlider from "./components/VolumeSlider";
 
 const albums: string[][] = [
 	[
@@ -61,11 +58,6 @@ const App = () => {
 	const animatedY = useSharedValue(0);
 	const recordX = useSharedValue(0);
 	const recordZIndex = useSharedValue(0);
-	const sliderHeight = useSharedValue(0);
-	const sliderWidth = useSharedValue(0);
-	const startY = useSharedValue(0);
-	const volumeHeight = useSharedValue(0);
-	const y = useSharedValue(0);
 
 	const [expandedAlbum, setExpandedAlbum] = useState<null | {
 		index: number;
@@ -165,21 +157,6 @@ const App = () => {
 			}
 		);
 	};
-
-	const panGesture = Gesture.Pan()
-		.onStart(() => (startY.value = y.value))
-		.onUpdate((e) => {
-			const newY = startY.value + e.translationY;
-			y.value = Math.min(
-				volumeHeight.value / 2 - sliderHeight.value / 2,
-				Math.max(-volumeHeight.value / 2 + sliderHeight.value / 2, newY)
-			);
-		});
-
-	const animatedStyle = useAnimatedStyle(() => ({
-		transform: [{ translateY: y.value }],
-		left: sliderWidth.value * 0.125
-	}));
 
 	const overlayAnimatedStyle = useAnimatedStyle(() => ({
 		height: animatedHeight.value,
@@ -327,39 +304,7 @@ const App = () => {
 								}}
 							/>
 						</View>
-						<View
-							style={{
-								alignItems: "center",
-								display: "flex",
-								flex: 1,
-								justifyContent: "center"
-							}}
-						>
-							<Image
-								onLayout={(e) => {
-									volumeHeight.value =
-										e.nativeEvent.layout.height;
-								}}
-								source={require("./assets/volume.png")}
-							/>
-							<GestureDetector gesture={panGesture}>
-								<Animated.Image
-									onLayout={(e) => {
-										sliderHeight.value =
-											e.nativeEvent.layout.height;
-										sliderWidth.value =
-											e.nativeEvent.layout.width;
-									}}
-									source={require("./assets/slider.png")}
-									style={[
-										{
-											position: "absolute"
-										},
-										animatedStyle
-									]}
-								/>
-							</GestureDetector>
-						</View>
+						<VolumeSlider />
 					</View>
 				</SafeAreaView>
 				<BottomInsetGradient />
