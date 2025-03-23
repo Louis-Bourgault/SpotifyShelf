@@ -58,6 +58,8 @@ const App = () => {
 	const animatedWidth = useSharedValue(0);
 	const animatedX = useSharedValue(0);
 	const animatedY = useSharedValue(0);
+	const recordX = useSharedValue(0);
+	const recordZIndex = useSharedValue(0);
 	const sliderHeight = useSharedValue(0);
 	const sliderWidth = useSharedValue(0);
 	const startY = useSharedValue(0);
@@ -74,31 +76,49 @@ const App = () => {
 
 	const handleAlbumClose = () => {
 		if (expandedAlbum) {
-			animatedHeight.value = withTiming(100, {
-				duration: 1000,
-				easing: Easing.inOut(Easing.ease)
-			});
-			animatedWidth.value = withTiming(100, {
-				duration: 1000,
-				easing: Easing.inOut(Easing.ease)
-			});
-			animatedX.value = withTiming(expandedAlbum?.layout.x, {
-				duration: 1000,
-				easing: Easing.inOut(Easing.ease)
-			});
-			animatedY.value = withTiming(
-				expandedAlbum?.layout.y - insets.top,
-				{
-					duration: 1000,
-					easing: Easing.inOut(Easing.ease)
-				},
-				(finished) => {
-					if (finished) {
-						runOnJS(setSelectedAlbumIndex)(null);
-						runOnJS(setExpandedAlbum)(null);
-					}
+			recordX.value = withTiming(200, { duration: 1000 }, (f) => {
+				if (f) {
+					recordZIndex.value = 0;
+					recordX.value = withTiming(
+						0,
+						{ duration: 1000 },
+						(finished) => {
+							if (finished) {
+								animatedHeight.value = withTiming(100, {
+									duration: 1000,
+									easing: Easing.inOut(Easing.ease)
+								});
+								animatedWidth.value = withTiming(100, {
+									duration: 1000,
+									easing: Easing.inOut(Easing.ease)
+								});
+								animatedX.value = withTiming(
+									expandedAlbum?.layout.x,
+									{
+										duration: 1000,
+										easing: Easing.inOut(Easing.ease)
+									}
+								);
+								animatedY.value = withTiming(
+									expandedAlbum?.layout.y - insets.top,
+									{
+										duration: 1000,
+										easing: Easing.inOut(Easing.ease)
+									},
+									(finished) => {
+										if (finished) {
+											runOnJS(setSelectedAlbumIndex)(
+												null
+											);
+											runOnJS(setExpandedAlbum)(null);
+										}
+									}
+								);
+							}
+						}
+					);
 				}
-			);
+			});
 		}
 	};
 
@@ -126,10 +146,23 @@ const App = () => {
 			duration: 1000,
 			easing: Easing.inOut(Easing.ease)
 		});
-		animatedY.value = withTiming((0.35 * screenHeight) / 2 - 100, {
-			duration: 1000,
-			easing: Easing.inOut(Easing.ease)
-		});
+		animatedY.value = withTiming(
+			(0.35 * screenHeight) / 2 - 100,
+			{
+				duration: 1000,
+				easing: Easing.inOut(Easing.ease)
+			},
+			(finished) => {
+				if (finished) {
+					recordX.value = withTiming(200, { duration: 1000 }, (f) => {
+						if (f) {
+							recordX.value = withTiming(100, { duration: 1000 });
+							recordZIndex.value = 2;
+						}
+					});
+				}
+			}
+		);
 	};
 
 	const panGesture = Gesture.Pan()
@@ -153,6 +186,11 @@ const App = () => {
 		position: "absolute",
 		top: animatedY.value,
 		width: animatedWidth.value
+	}));
+
+	const recordAnimatedStyle = useAnimatedStyle(() => ({
+		transform: [{ translateX: recordX.value }],
+		zIndex: recordZIndex.value
 	}));
 
 	return (
@@ -211,8 +249,23 @@ const App = () => {
 										style={{
 											borderRadius: 10,
 											height: "100%",
-											width: "100%"
+											width: "100%",
+											zIndex: 1
 										}}
+									/>
+									<Animated.Image
+										resizeMode="cover"
+										source={require("./assets/record.png")}
+										style={[
+											{
+												position: "absolute",
+												height: "150%",
+												width: "150%",
+												top: "-35%",
+												left: "-25%"
+											},
+											recordAnimatedStyle
+										]}
 									/>
 								</Animated.View>
 							</Pressable>
