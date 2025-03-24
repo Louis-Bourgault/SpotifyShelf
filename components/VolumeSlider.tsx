@@ -26,6 +26,7 @@ const VolumeSlider = () => {
 				Math.max(-volumeHeight.value / 2 + sliderHeight.value / 2, newY)
 			);
 		});
+
 	return (
 		<View
 			style={{
