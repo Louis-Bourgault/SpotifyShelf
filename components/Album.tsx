@@ -7,6 +7,7 @@ import Animated, {
 	withTiming
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Record from "./Record";
 
 const Album: React.FC<{
 	index: number;
@@ -56,18 +57,31 @@ const Album: React.FC<{
 
 	const handleGrowth = () => {
 		setIsExpanded(true);
-		
-		const targetX = (screenWidth - 200) / 2;
-		const targetY = (screenHeight - 200) * 0.175;
 
-		animatedHeight.value = withTiming(200, { duration: 1000 });
-		animatedWidth.value = withTiming(200, { duration: 1000 });
+		const targetX = (screenWidth - 150) / 2;
+		const targetY = (screenHeight - 150) * 0.175;
+
+		animatedHeight.value = withTiming(150, { duration: 1000 });
+		animatedWidth.value = withTiming(150, { duration: 1000 });
 		animatedX.value = withTiming(targetX, {
 			duration: 1000
 		});
-		animatedY.value = withTiming(targetY, {
-			duration: 1000
-		});
+		animatedY.value = withTiming(
+			targetY,
+			{
+				duration: 1000
+			},
+			(finished) => {
+				recordX.value = withTiming(
+					150,
+					{ duration: 1000 },
+					(finished) => {
+						recordZIndex.value = 2;
+						recordX.value = withTiming(75, { duration: 1000 });
+					}
+				);
+			}
+		);
 	};
 
 	const handleMeasure = () => {
@@ -100,15 +114,35 @@ const Album: React.FC<{
 	};
 
 	const handleShrink = () => {
-		animatedHeight.value = withTiming(100, { duration: 1000 });
-		animatedWidth.value = withTiming(100, { duration: 1000 });
-		animatedX.value = withTiming(originalPosition.x, { duration: 1000 });
-		animatedY.value = withTiming(
-			originalPosition.y,
+		recordX.value = withTiming(
+			150,
 			{ duration: 1000 },
-			(finished) => {
-				runOnJS(setIsExpanded)(false);
-			}
+			(finished) => (
+				(recordZIndex.value = 0),
+				(recordX.value = withTiming(
+					0,
+					{ duration: 1000 },
+					(finished) => {
+						animatedHeight.value = withTiming(100, {
+							duration: 1000
+						});
+						animatedWidth.value = withTiming(100, {
+							duration: 1000
+						});
+						animatedX.value = withTiming(originalPosition.x, {
+							duration: 1000
+						});
+						animatedY.value = withTiming(
+							originalPosition.y,
+							{ duration: 1000 },
+							(finished) => {
+								runOnJS(setSelectedAlbumIndex)(null);
+								runOnJS(setIsExpanded)(false);
+							}
+						);
+					}
+				))
+			)
 		);
 	};
 
@@ -128,10 +162,11 @@ const Album: React.FC<{
 						alignItems: "center",
 						borderRadius: 5,
 						height: "100%",
-						width: "100%"
+						width: "100%",
+						zIndex: 1
 					}}
 				/>
-				{/* <Record image={imageURL} x={recordX} zIndex={recordZIndex} /> */}
+				<Record image={imageURL} x={recordX} zIndex={recordZIndex} />
 			</Animated.View>
 		</Pressable>
 	);

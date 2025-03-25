@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ImageBackground, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomInsetGradient from "./components/BottomInsetGradient";
 import Turntable from "./components/Turntable";
 import Album from "./components/Album";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming
+} from "react-native-reanimated";
 
 const albums: string[] = [
 	"https://www.rollingstone.com/wp-content/uploads/2020/09/R1344-001-Marvin-Gaye-WHATS-GOING-ON.jpg?w=1000",
@@ -21,9 +26,21 @@ const albums: string[] = [
 ];
 
 const App = () => {
+	const opacity = useSharedValue(0);
+
 	const [selectedAlbumIndex, setSelectedAlbumIndex] = useState<number | null>(
 		null
 	);
+
+	useEffect(() => {
+		opacity.value = withTiming(selectedAlbumIndex !== null ? 0.5 : 0, {
+			duration: 1000
+		});
+	}, [selectedAlbumIndex]);
+
+	const animatedStyle = useAnimatedStyle(() => {
+		return { opacity: opacity.value };
+	});
 
 	return (
 		<ImageBackground
@@ -32,6 +49,21 @@ const App = () => {
 			resizeMode="cover"
 		>
 			<SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+				<Animated.View
+					pointerEvents={"none"}
+					style={[
+						{
+							backgroundColor: "rgb(0,0,0)",
+							bottom: 0,
+							left: 0,
+							position: "absolute",
+							right: 0,
+							top: 0,
+							zIndex: 10
+						},
+						animatedStyle
+					]}
+				/>
 				<View
 					style={{
 						height: "70%",

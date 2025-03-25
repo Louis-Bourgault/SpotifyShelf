@@ -1,11 +1,14 @@
 import React from "react";
-import { Image } from "react-native";
+import { Image, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	SharedValue,
 	useAnimatedStyle,
-	useSharedValue
+	useSharedValue,
+	withTiming
 } from "react-native-reanimated";
+import { getPlatterCenter } from "./Turntable";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Record: React.FC<{
 	image: string;
@@ -28,6 +31,13 @@ const Record: React.FC<{
 		zIndex: zIndex.value
 	}));
 
+	const platterCenter = getPlatterCenter();
+	const insets = useSafeAreaInsets();
+	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+	const screenWidth = windowWidth;
+
+	const screenHeight = windowHeight - insets.top - insets.bottom;
+
 	const panGesture = Gesture.Pan()
 		.onStart(() => {
 			startX.value = x.value;
@@ -39,6 +49,24 @@ const Record: React.FC<{
 
 			x.value = newX;
 			y.value = newY;
+		})
+		.onEnd(() => {
+			const record = {
+				x: x.value + 75 + screenWidth / 2,
+				y: y.value + (screenHeight - 150) * 0.175
+			};
+
+			const distance = Math.sqrt(
+				(record.x - platterCenter.x) ** 2 +
+					(record.y - platterCenter.y) ** 2
+			);
+
+			const isOverPlatter = distance < screenHeight * 0.3 * 0.6;
+
+			if (isOverPlatter) {
+				x.value = platterCenter.x - screenWidth / 2;
+				y.value = platterCenter.y - 75 - (screenHeight - 150) * 0.175;
+			}
 		});
 
 	return (
@@ -46,11 +74,11 @@ const Record: React.FC<{
 			<Animated.View
 				style={[
 					{
-						height: 100,
+						height: "100%",
 						left: 0,
 						position: "absolute",
 						top: 0,
-						width: 100
+						width: "100%"
 					},
 					animatedStyle
 				]}
