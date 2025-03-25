@@ -1,6 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Image, View } from "react-native";
+import { Image, useWindowDimensions, View } from "react-native";
 import VolumeSlider from "./VolumeSlider";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Turntable = () => {
 	return (
@@ -59,6 +60,20 @@ const Turntable = () => {
 			<VolumeSlider />
 		</View>
 	);
+};
+
+export const getPlatterCenter = () => {
+	const insets = useSafeAreaInsets();
+
+	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+
+	const screenHeight = windowHeight - insets.top - insets.bottom;
+	const screenWidth = windowWidth;
+	const height = screenHeight * 0.3;
+	const top = screenHeight * 0.7;
+	const center = { x: screenWidth / 2, y: top + height / 2 };
+
+	return center;
 };
 
 export default Turntable;

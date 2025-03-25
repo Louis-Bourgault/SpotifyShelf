@@ -64,7 +64,6 @@ const App = () => {
 						animatedStyle
 					]}
 				/>
-
 				<View
 					style={{
 						height: "70%",
