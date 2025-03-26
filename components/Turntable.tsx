@@ -45,17 +45,30 @@ const Turntable = () => {
 				style={{
 					alignItems: "center",
 					flex: 2,
-					justifyContent: "center"
+					justifyContent: "center",
+					position: "relative"
 				}}
 			>
 				<View
 					style={{
 						aspectRatio: 1,
-						backgroundColor: "#262626",
-						borderRadius: 125,
-						height: "60%"
+						height: "60%",
+						position: "relative"
 					}}
-				/>
+				>
+					<View
+						style={{
+							aspectRatio: 1,
+							backgroundColor: "#262626",
+							borderRadius: 125,
+							height: "100%"
+						}}
+					/>
+					<Image
+						source={require("../assets/tonearmBase.png")}
+						style={{ position: "absolute", top: 0, right: -24 }}
+					/>
+				</View>
 			</View>
 			<VolumeSlider />
 		</View>
