@@ -42,12 +42,13 @@ const Record: React.FC<{
 	const screenWidth = windowWidth;
 	const screenHeight = windowHeight - insets.top - insets.bottom;
 
+	const platterCenter = getPlatterCenter();
+
 	const panGesture = Gesture.Pan()
 		.onStart(() => {
 			startX.value = x.value;
 			startY.value = y.value;
 		})
-
 		.onUpdate((e) => {
 			const newX = startX.value + e.translationX;
 			const newY = startY.value + e.translationY;
@@ -55,14 +56,11 @@ const Record: React.FC<{
 			x.value = newX;
 			y.value = newY;
 		})
-
 		.onEnd(() => {
 			const record = {
 				x: x.value + 75 + screenWidth / 2,
 				y: y.value + (screenHeight - 150) * 0.175
 			};
-
-			const platterCenter = getPlatterCenter();
 
 			const distance = Math.sqrt(
 				(record.x - platterCenter.x) ** 2 +
