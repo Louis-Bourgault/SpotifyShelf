@@ -2,8 +2,33 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image, useWindowDimensions, View } from "react-native";
 import VolumeSlider from "./VolumeSlider";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue
+} from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const Turntable = () => {
+	const tonearmRotation = useSharedValue(-20);
+	const startX = useSharedValue(0);
+
+	const tonearmStyle = useAnimatedStyle(() => {
+		return { transform: [{ rotate: `${tonearmRotation.value}deg` }] };
+	});
+
+	const panGesture = Gesture.Pan()
+		.onStart(() => {
+			startX.value = tonearmRotation.value;
+		})
+		.onUpdate((e) => {
+			const newX = startX.value + e.translationX;
+
+			tonearmRotation.value =
+				newX > 20 || newX < -10 ? tonearmRotation.value : -newX;
+
+			console.log(tonearmRotation.value);
+		});
+
 	return (
 		<View
 			style={{
@@ -53,7 +78,7 @@ const Turntable = () => {
 					style={{
 						aspectRatio: 1,
 						height: "60%",
-						position: "relative"
+						flexDirection: "row"
 					}}
 				>
 					<View
@@ -64,10 +89,33 @@ const Turntable = () => {
 							height: "100%"
 						}}
 					/>
-					<Image
-						source={require("../assets/tonearmBase.png")}
-						style={{ position: "absolute", top: 0, right: -24 }}
-					/>
+					<View
+						style={{
+							width: 0,
+							height: "100%",
+							position: "relative"
+						}}
+					>
+						<Image
+							source={require("../assets/tonearmBase.png")}
+							style={{ position: "absolute", top: 0, right: -24}}
+						/>
+						<GestureDetector gesture={panGesture}>
+							<Animated.Image
+								source={require("../assets/tonearm.png")}
+								style={[
+									{
+										position: "absolute",
+										top: -5,
+										right: -18,
+										transformOrigin: "top right",
+										zIndex: 999
+									},
+									tonearmStyle
+								]}
+							/>
+						</GestureDetector>
+					</View>
 				</View>
 			</View>
 			<VolumeSlider />
